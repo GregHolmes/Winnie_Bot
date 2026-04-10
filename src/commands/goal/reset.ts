@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { Goal, GuildConfig, UserConfig } from '../../models'
 import { GoalDurations, GoalTypes, SubCommand } from '../../types'
 import { GoalService } from '../../services'
@@ -12,18 +12,18 @@ export const GoalResetCommand: SubCommand = {
   commandData: async (locale: string) => ({
     name: NAME,
     description: await I18n.translate(locale, 'commands:goal.reset.description'),
-    type: 'SUB_COMMAND',
+    type: ApplicationCommandOptionType.Subcommand,
     options: [
       {
         name: 'target',
         description: await I18n.translate(locale, 'commands:goal.reset.args.target'),
-        type: 'INTEGER',
+        type: ApplicationCommandOptionType.Integer,
         required: true
       },
       {
         name: 'type',
         description: await I18n.translate(locale, 'commands:goal.reset.args.type'),
-        type: 'STRING',
+        type: ApplicationCommandOptionType.String,
         choices: Object.values(GoalTypes).map((type) => ({
           name: type,
           value: type
@@ -33,7 +33,7 @@ export const GoalResetCommand: SubCommand = {
       {
         name: 'duration',
         description: await I18n.translate(locale, 'commands:goal.reset.args.duration'),
-        type: 'STRING',
+        type: ApplicationCommandOptionType.String,
         choices: Object.values(GoalDurations).map((duration) => ({
           name: duration,
           value: duration
@@ -42,7 +42,7 @@ export const GoalResetCommand: SubCommand = {
       }
     ]
   }),
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
     const goalDuration = interaction.options.getString('duration') as GoalDurations ?? GoalDurations.DAILY
     const oldGoal = await GoalService.activeGoalForUser(interaction.user.id, goalDuration)
     if (oldGoal == null) {
@@ -82,7 +82,7 @@ export const GoalResetCommand: SubCommand = {
   * @param userConfig The config object of the user that executed the command.
   * @returns true if the user or guild does not have a timezone set.
   */
-async function userTimezone (interaction: CommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig): Promise<IANAZone | null> {
+async function userTimezone (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig): Promise<IANAZone | null> {
   if (userConfig?.timezone != null) { return userConfig.timezone }
   if (guildConfig.timezone != null) { return guildConfig.timezone }
 
@@ -98,7 +98,7 @@ async function userTimezone (interaction: CommandInteraction, guildConfig: Guild
  * @param newGoalOptions The new goal options passed to the command
  * @returns The newly created goal.
  */
-async function createNewGoal (interaction: CommandInteraction, oldGoal: Goal, progress: number, timezone: IANAZone): Promise<Goal> {
+async function createNewGoal (interaction: ChatInputCommandInteraction, oldGoal: Goal, progress: number, timezone: IANAZone): Promise<Goal> {
   return await GoalService.createGoal({
     guildId: interaction.guild?.id,
     ownerId: oldGoal.ownerId,

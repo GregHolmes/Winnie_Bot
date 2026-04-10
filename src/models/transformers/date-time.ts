@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { ValueTransformer } from 'typeorm/decorator/options/ValueTransformer'
+import { ValueTransformer } from 'typeorm'
 
 class DateTimeTransformer implements ValueTransformer {
   from (value: string): DateTime {
@@ -7,7 +7,7 @@ class DateTimeTransformer implements ValueTransformer {
   }
 
   to (value: DateTime): string {
-    return value.toISO()
+    return value.toISO() ?? ''
   }
 }
 
@@ -21,7 +21,7 @@ class NullableDateTimeTransformer implements ValueTransformer {
   to (value: DateTime): string | null {
     if (value == null) { return null }
 
-    return value.toISO()
+    return value.toISO() ?? null
   }
 }
 

@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { GoalDurations, SubCommand } from '../../types'
 import { GoalService } from '../../services'
 import { GuildConfig } from '../../models'
@@ -11,12 +11,12 @@ export const GoalCancelCommand: SubCommand = {
   commandData: async (locale: string) => ({
     name: NAME,
     description: await I18n.translate(locale, 'commands:goal.cancel.description'),
-    type: 'SUB_COMMAND',
+    type: ApplicationCommandOptionType.Subcommand,
     options: [
       {
         name: 'duration',
         description: await I18n.translate(locale, 'commands:goal.reset.args.duration'),
-        type: 'STRING',
+        type: ApplicationCommandOptionType.String,
         choices: Object.values(GoalDurations).map((duration) => ({
           name: duration,
           value: duration
@@ -25,7 +25,7 @@ export const GoalCancelCommand: SubCommand = {
       }
     ]
   }),
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig) => {
     const goalDuration = interaction.options.getString('duration') as GoalDurations ?? GoalDurations.DAILY
     const goal = await GoalService.activeGoalForUser(interaction.user.id, goalDuration)
     if (goal == null) {

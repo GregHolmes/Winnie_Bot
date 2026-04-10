@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { GuildConfig } from '../../models'
 import { I18n } from '../../core'
 import { SubCommand } from '../../types'
@@ -10,27 +10,27 @@ export const ServerAnnouncementsChannelCommand: SubCommand = {
   commandData: async (locale: string) => ({
     name: NAME,
     description: await I18n.translate(locale, 'commands:server.announcementsChannel.description'),
-    type: 'SUB_COMMAND_GROUP',
+    type: ApplicationCommandOptionType.SubcommandGroup,
     options: [
       {
         name: 'get',
         description: await I18n.translate(locale, 'commands:server.announcementsChannel.get.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'reset',
         description: await I18n.translate(locale, 'commands:server.announcementsChannel.reset.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'set',
         description: await I18n.translate(locale, 'commands:server.announcementsChannel.set.description'),
-        type: 'SUB_COMMAND',
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: 'announcements_channel',
             description: await I18n.translate(locale, 'commands:server.announcementsChannel.set.args.announcementsChannel'),
-            type: 'CHANNEL',
+            type: ApplicationCommandOptionType.Channel,
             required: true
           }
         ]
@@ -38,7 +38,7 @@ export const ServerAnnouncementsChannelCommand: SubCommand = {
     ]
   }),
 
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig) => {
     const subcommand = interaction.options.getSubcommand()
     if (subcommand == null) { return }
 
@@ -56,7 +56,7 @@ export const ServerAnnouncementsChannelCommand: SubCommand = {
   }
 }
 
-async function get (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function get (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   if (guildConfig.announcementsChannelId == null) {
     await interaction.reply(await I18n.translate(guildConfig.locale, 'commands:server.announcementsChannel.get.error.notSet'))
   } else {
@@ -66,7 +66,7 @@ async function get (interaction: CommandInteraction, guildConfig: GuildConfig): 
   }
 }
 
-async function reset (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function reset (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   guildConfig.announcementsChannelId = null
   await guildConfig.save()
 
@@ -77,7 +77,7 @@ async function reset (interaction: CommandInteraction, guildConfig: GuildConfig)
   }
 }
 
-async function set (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function set (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   const announcementsChannel = interaction.options.getChannel('announcements_channel', true).id
   guildConfig.announcementsChannelId = announcementsChannel
   await guildConfig.save()

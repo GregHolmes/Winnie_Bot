@@ -60,7 +60,7 @@ async function announceRaptor (goal: Goal, raptor: Raptor, messageKey: string): 
 
   try {
     await channel.send(message)
-  } catch (error) {
+  } catch {
     Logger.error(`Unable to announce raptors in channel ${goal.channelId}`)
   }
 }

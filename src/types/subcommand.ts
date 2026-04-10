@@ -1,4 +1,4 @@
-import { ApplicationCommandOption, CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionData, ChatInputCommandInteraction } from 'discord.js'
 import { GuildConfig, UserConfig } from '../models'
 
 /**
@@ -19,7 +19,7 @@ export interface SubCommand {
   /**
    * Builds the command data object that gets sent to discord when registering a command
    */
-  commandData: (locale: string) => Promise<ApplicationCommandOption>
+  commandData: (locale: string) => Promise<ApplicationCommandOptionData>
 
   /**
    * The function used to execute the command.
@@ -29,5 +29,5 @@ export interface SubCommand {
    * @param message - The message which ran the command.
    * @param guildConfig - The configuration object for the guild the command was run in
    */
-  execute: (interaction: CommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => Promise<void>
+  execute: (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => Promise<void>
 }

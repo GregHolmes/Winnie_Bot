@@ -10,11 +10,11 @@ import { Logger } from '../core'
  *  - responding to commands
  */
 export const InteractionEvent: Event = {
-  name: 'interaction',
+  name: 'interactionCreate',
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   handle: async (interaction: Interaction) => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (!interaction.isCommand()) { return }
+    if (!interaction.isChatInputCommand()) { return }
     if (interaction.guildId == null) { return }
 
     const command = Commands.commandList.find((c) => c.name === interaction.commandName)

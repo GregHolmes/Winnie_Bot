@@ -1,4 +1,4 @@
-import { ApplicationCommandData, CommandInteraction } from 'discord.js'
+import { ApplicationCommandData, ChatInputCommandInteraction } from 'discord.js'
 import { Command } from '../../types'
 import { CommandUtils } from '../utils'
 import { GoalCancelCommand } from './cancel'
@@ -35,7 +35,7 @@ export const GoalCommand: Command = {
       await GoalUpdateCommand.commandData(locale)
     ]
   }),
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
     await CommandUtils.executeTopLevelCommand(commands, interaction, guildConfig, userConfig)
   }
 }

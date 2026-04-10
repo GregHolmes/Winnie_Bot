@@ -1,4 +1,4 @@
-import { ApplicationCommandData, CommandInteraction } from 'discord.js'
+import { ApplicationCommandData, ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { Command } from '../../types'
 import { GuildConfig } from '../../models'
 import { I18n } from '../../core'
@@ -15,7 +15,7 @@ export const PromptCommand: Command = {
       {
         name: 'type',
         description: await I18n.translate(locale, 'commands:prompt.args.type'),
-        type: 'STRING',
+        type: ApplicationCommandOptionType.String,
         choices: Object.values(PromptTypes).map((type) => ({
           name: type,
           value: type
@@ -24,7 +24,7 @@ export const PromptCommand: Command = {
       }
     ]
   }),
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig) => {
     const promptGenre = interaction.options.getString('type', true)
     const prompts = await I18n.translate(guildConfig.locale, `prompts:${promptGenre}`, { returnObjects: true }) as unknown
     const promptList = prompts as string[]

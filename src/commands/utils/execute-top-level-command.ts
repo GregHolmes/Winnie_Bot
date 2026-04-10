@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { GuildConfig, UserConfig } from '../../models'
 import { Logger } from '../../core'
 import { SubCommand } from '../../types'
@@ -13,7 +13,7 @@ import { SubCommand } from '../../types'
  */
 async function executeTopLevelCommand (
   commands: SubCommand[],
-  interaction: CommandInteraction,
+  interaction: ChatInputCommandInteraction,
   guildConfig: GuildConfig,
   userConfig: UserConfig
 ): Promise<void> {

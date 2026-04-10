@@ -9,8 +9,7 @@ import { WinnieClient } from '../../core'
  * @param validationOptions Options to pass into the validator.
  */
 export function IsChannelWithPermission (permission: PermissionResolvable, validationOptions?: ValidationOptions) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  return function (object: Object, propertyName: string): void {
+  return function (object: object, propertyName: string): void {
     registerDecorator({
       name: 'IsChannelWithPermission',
       target: object.constructor,
@@ -21,14 +20,14 @@ export function IsChannelWithPermission (permission: PermissionResolvable, valid
           let channel
           try {
             channel = await WinnieClient.client.channels.fetch(channelId)
-          } catch (error) {
+          } catch {
             return false
           }
 
           if (!(channel instanceof GuildChannel)) { return false }
 
           const guildChannel = channel
-          const winnieMember = guildChannel.guild.me
+          const winnieMember = guildChannel.guild.members.me
           if (winnieMember == null) { return false }
 
           return guildChannel.permissionsFor(winnieMember)?.has(permission) ?? false

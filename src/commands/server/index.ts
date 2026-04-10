@@ -1,4 +1,4 @@
-import { ApplicationCommandData, CommandInteraction } from 'discord.js'
+import { ApplicationCommandData, ChatInputCommandInteraction } from 'discord.js'
 import { Command } from '../../types'
 import { GuildConfig, UserConfig } from '../../models'
 import { I18n } from '../../core'
@@ -29,7 +29,7 @@ export const ServerCommand: Command = {
       await ServerTimezoneCommand.commandData(locale)
     ]
   }),
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
     await executeTopLevelCommand(commands, interaction, guildConfig, userConfig)
   }
 }

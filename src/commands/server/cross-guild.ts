@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { GuildConfig } from '../../models'
 import { I18n } from '../../core'
 import { SubCommand } from '../../types'
@@ -10,27 +10,27 @@ export const ServerCrossGuildCommand: SubCommand = {
   commandData: async (locale: string) => ({
     name: NAME,
     description: await I18n.translate(locale, 'commands:server.crossGuild.description'),
-    type: 'SUB_COMMAND_GROUP',
+    type: ApplicationCommandOptionType.SubcommandGroup,
     options: [
       {
         name: 'get',
         description: await I18n.translate(locale, 'commands:server.crossGuild.get.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'reset',
         description: await I18n.translate(locale, 'commands:server.crossGuild.reset.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'set',
         description: await I18n.translate(locale, 'commands:server.crossGuild.set.description'),
-        type: 'SUB_COMMAND',
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: 'enabled',
             description: await I18n.translate(locale, 'commands:server.crossGuild.set.args.enabled'),
-            type: 'BOOLEAN',
+            type: ApplicationCommandOptionType.Boolean,
             required: true
           }
         ]
@@ -38,7 +38,7 @@ export const ServerCrossGuildCommand: SubCommand = {
     ]
   }),
 
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig) => {
     const subcommand = interaction.options.getSubcommand()
     if (subcommand == null) { return }
 
@@ -56,13 +56,13 @@ export const ServerCrossGuildCommand: SubCommand = {
   }
 }
 
-async function get (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function get (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   const key = guildConfig.crossGuild ? 'enabled' : 'disabled'
 
   await interaction.reply(await I18n.translate(guildConfig.locale, `commands:server.crossGuild.get.${key}`))
 }
 
-async function reset (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function reset (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   guildConfig.crossGuild = true
   await guildConfig.save()
 
@@ -73,7 +73,7 @@ async function reset (interaction: CommandInteraction, guildConfig: GuildConfig)
   }
 }
 
-async function set (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function set (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   guildConfig.crossGuild = interaction.options.getBoolean('enabled', true)
   await guildConfig.save()
 

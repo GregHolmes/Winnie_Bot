@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { GuildConfig, UserConfig } from '../../models'
 import { I18n } from '../../core'
 import { IANAZone } from 'luxon'
@@ -11,27 +11,27 @@ export const ConfigTimezoneCommand: SubCommand = {
   commandData: async (locale: string) => ({
     name: NAME,
     description: await I18n.translate(locale, 'commands:config.timezone.description'),
-    type: 'SUB_COMMAND_GROUP',
+    type: ApplicationCommandOptionType.SubcommandGroup,
     options: [
       {
         name: 'get',
         description: await I18n.translate(locale, 'commands:config.timezone.get.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'reset',
         description: await I18n.translate(locale, 'commands:config.timezone.reset.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'set',
         description: await I18n.translate(locale, 'commands:config.timezone.set.description'),
-        type: 'SUB_COMMAND',
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: 'timezone',
             description: await I18n.translate(locale, 'commands:config.timezone.set.args.timezone'),
-            type: 'STRING',
+            type: ApplicationCommandOptionType.String,
             required: true
           }
         ]
@@ -39,7 +39,7 @@ export const ConfigTimezoneCommand: SubCommand = {
     ]
   }),
 
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig) => {
     const subcommand = interaction.options.getSubcommand()
     if (subcommand == null) { return }
 
@@ -57,7 +57,7 @@ export const ConfigTimezoneCommand: SubCommand = {
   }
 }
 
-async function get (interaction: CommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig): Promise<void> {
+async function get (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig, userConfig: UserConfig): Promise<void> {
   if (userConfig.timezone == null) {
     await interaction.reply(await I18n.translate(guildConfig.locale, 'commands:config.timezone.get.error.notSet'))
   } else {
@@ -67,7 +67,7 @@ async function get (interaction: CommandInteraction, guildConfig: GuildConfig, u
   }
 }
 
-async function reset (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function reset (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   const userConfig = await UserConfig.findOrCreate(interaction.user.id)
   userConfig.timezone = null
   await userConfig.save()
@@ -79,7 +79,7 @@ async function reset (interaction: CommandInteraction, guildConfig: GuildConfig)
   }
 }
 
-async function set (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function set (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   const userConfig = await UserConfig.findOrCreate(interaction.user.id)
   const timezone = interaction.options.getString('timezone', true)
 

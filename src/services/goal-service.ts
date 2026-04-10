@@ -1,6 +1,7 @@
 import { DateTime, IANAZone } from 'luxon'
 import { Goal } from '../models'
 import { GoalCreateOptions, GoalDurations } from '../types'
+import { IsNull } from 'typeorm'
 import { PeriodConfig } from '../models/period-config'
 import { Snowflake } from 'discord.js'
 
@@ -50,7 +51,7 @@ async function activeGoalForUser (userId: Snowflake, goalDuration: GoalDurations
 }
 
 async function allActive (): Promise<Goal[]> {
-  return await Goal.find({ where: 'Goal.completed_at IS NULL AND Goal.canceled_at IS NULL' })
+  return await Goal.find({ where: { completedAt: IsNull(), canceledAt: IsNull() } })
 }
 
 function estimateCompletionDate (timezone: IANAZone, goalDuration: GoalDurations): DateTime {

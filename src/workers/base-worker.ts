@@ -10,11 +10,11 @@ export class BaseWorker {
     I18n.init().catch(() => { process.exit() })
 
     this.worker = new Worker(queueName, this.handleJob(jobTypes), {
-      connection: JobQueue.connectionOptions
+      connection: JobQueue.connection
     })
 
     this.worker.on('failed', (job, error) => {
-      Logger.error(`Failed job ${job.id ?? ''} with ${error.message}`)
+      Logger.error(`Failed job ${job?.id ?? ''} with ${error.message}`)
     })
   }
 

@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { GoalDurations, SubCommand } from '../../types'
 import { GoalService } from '../../services'
 import { GuildConfig } from '../../models'
@@ -11,18 +11,18 @@ export const GoalUpdateCommand: SubCommand = {
   commandData: async (locale: string) => ({
     name: NAME,
     description: await I18n.translate(locale, 'commands:goal.update.description'),
-    type: 'SUB_COMMAND',
+    type: ApplicationCommandOptionType.Subcommand,
     options: [
       {
         name: 'progress',
         description: await I18n.translate(locale, 'commands:goal.update.args.progress'),
-        type: 'INTEGER',
+        type: ApplicationCommandOptionType.Integer,
         required: true
       },
       {
         name: 'duration',
         description: await I18n.translate(locale, 'commands:goal.reset.args.duration'),
-        type: 'STRING',
+        type: ApplicationCommandOptionType.String,
         choices: Object.values(GoalDurations).map((duration) => ({
           name: duration,
           value: duration
@@ -31,7 +31,7 @@ export const GoalUpdateCommand: SubCommand = {
       }
     ]
   }),
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig) => {
     const goalDuration = interaction.options.getString('duration') as GoalDurations ?? GoalDurations.DAILY
     const goal = await GoalService.activeGoalForUser(interaction.user.id, goalDuration)
     if (goal == null) {
@@ -60,7 +60,7 @@ export const GoalUpdateCommand: SubCommand = {
   * @param locale the locale to use when looking up strings
   * @returns The progress update if the number is valid, -1 if it's invalid
   */
-async function progressUpdate (interaction: CommandInteraction, locale: string): Promise<number> {
+async function progressUpdate (interaction: ChatInputCommandInteraction, locale: string): Promise<number> {
   const progressUpdate = interaction.options.getInteger('progress', true)
 
   if (progressUpdate <= 0) {

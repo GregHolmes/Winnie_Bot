@@ -51,7 +51,7 @@ export class UserConfig extends BaseModel {
    * @param id - The id of the user
    */
   static async findOrCreate (id: Snowflake): Promise<UserConfig> {
-    let config = await UserConfig.findOne(id)
+    let config = await UserConfig.findOneBy({ id })
     if (config != null) { return config }
 
     config = new UserConfig()

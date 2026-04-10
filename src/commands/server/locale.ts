@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js'
 import { CommandUtils } from '../utils'
 import { GuildConfig } from '../../models'
 import { I18n, Logger } from '../../core'
@@ -11,27 +11,27 @@ export const ServerLocaleCommand: SubCommand = {
   commandData: async (locale: string) => ({
     name: NAME,
     description: await I18n.translate(locale, 'commands:server.locale.description'),
-    type: 'SUB_COMMAND_GROUP',
+    type: ApplicationCommandOptionType.SubcommandGroup,
     options: [
       {
         name: 'get',
         description: await I18n.translate(locale, 'commands:server.locale.get.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'reset',
         description: await I18n.translate(locale, 'commands:server.locale.reset.description'),
-        type: 'SUB_COMMAND'
+        type: ApplicationCommandOptionType.Subcommand
       },
       {
         name: 'set',
         description: await I18n.translate(locale, 'commands:server.locale.set.description'),
-        type: 'SUB_COMMAND',
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: 'locale',
             description: await I18n.translate(locale, 'commands:server.locale.set.args.locale'),
-            type: 'STRING',
+            type: ApplicationCommandOptionType.String,
             required: true,
             choices: await Promise.all(I18n.SUPPORTED_LANGUAGES.map(async (locale) => {
               return {
@@ -45,7 +45,7 @@ export const ServerLocaleCommand: SubCommand = {
     ]
   }),
 
-  execute: async (interaction: CommandInteraction, guildConfig: GuildConfig) => {
+  execute: async (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig) => {
     const subcommand = interaction.options.getSubcommand()
     if (subcommand == null) { return }
 
@@ -63,13 +63,13 @@ export const ServerLocaleCommand: SubCommand = {
   }
 }
 
-async function get (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function get (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   await interaction.reply(await I18n.translate(guildConfig.locale, 'commands:server.locale.get.success', {
     locale: await I18n.translate(guildConfig.locale, 'winnie:locale.name')
   }))
 }
 
-async function reset (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function reset (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   guildConfig.locale = GuildConfig.DEFAULT_LOCALE
   await guildConfig.save()
 
@@ -82,7 +82,7 @@ async function reset (interaction: CommandInteraction, guildConfig: GuildConfig)
   }
 }
 
-async function set (interaction: CommandInteraction, guildConfig: GuildConfig): Promise<void> {
+async function set (interaction: ChatInputCommandInteraction, guildConfig: GuildConfig): Promise<void> {
   Logger.info(interaction.options.getString('locale', true))
   guildConfig.locale = interaction.options.getString('locale', true)
   await guildConfig.save()

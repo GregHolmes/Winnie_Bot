@@ -10,12 +10,15 @@ import { Snowflake } from 'discord.js'
  */
 @Entity({ name: 'challenge_users' })
 export class ChallengeUser extends BaseModel {
+  @PrimaryColumn({ name: 'challenge_id' })
+  challengeId!: number
+
   /**
    * The challenge controller
    */
-  @ManyToOne(() => ChallengeController, challengeController => challengeController.users, { primary: true })
+  @ManyToOne(() => ChallengeController, challengeController => challengeController.users)
   @JoinColumn({ name: 'challenge_id' })
-  challengeController!: number
+  challengeController!: ChallengeController
 
   /**
    * The user's discord Id

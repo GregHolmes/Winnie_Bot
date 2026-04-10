@@ -1,8 +1,8 @@
+import { ChannelType, Message, PermissionFlagsBits } from 'discord.js'
 import { CommandUtils } from '../commands/utils'
 import { Event } from '../types'
 import { GuildConfig } from '../models'
 import { I18n, Logger, WinnieClient } from '../core'
-import { Message, Permissions } from 'discord.js'
 
 /**
  * Check the given message to see if the Winnie_Bot user was mentioned.
@@ -16,6 +16,7 @@ async function handleMention (message: Message, guildConfig: GuildConfig): Promi
   if (!message.mentions.has(WinnieClient.client.user, { ignoreEveryone: true, ignoreRoles: true })) { return }
 
   const response = await I18n.translate(guildConfig.locale, 'mentionResponse')
+  if (message.channel.type === ChannelType.GroupDM) { return }
   await message.channel.send(response)
   Logger.info('Winnie registered mention. Attempting to deploy commands.')
   await deployCommands(message, guildConfig)
@@ -25,7 +26,7 @@ async function deployCommands (message: Message, guildConfig: GuildConfig): Prom
   const author = message.member
   if (author == null) { return }
 
-  if (author.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+  if (author.permissions.has(PermissionFlagsBits.Administrator)) {
     try {
       await CommandUtils.deployCommands(guildConfig)
     } catch {
@@ -44,7 +45,7 @@ async function deployCommands (message: Message, guildConfig: GuildConfig): Prom
  *  - Responding to mentions with a help message
  */
 export const MessageEvent: Event = {
-  name: 'message',
+  name: 'messageCreate',
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   handle: async (message: Message): Promise<void> => {
     if (message.guild == null) { return } // Ignore direct messages.
