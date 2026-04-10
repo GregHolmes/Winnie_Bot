@@ -23,10 +23,10 @@
 ## Table of Contents
 
 * [Adding Winnie to your Discord server](#adding-winnie-to-your-discord-server)
-  * [Inviting the public Winnie_Bot account](#inviting-the-public-winnie_bot-account)
   * [Setting up your own instance of Winnie](#setting-up-your-own-instance-of-winnie)
     * [Requirements](#requirements)
     * [Setting up a Discord bot instance](#setting-up-a-discord-bot-instance)
+    * [Running Winnie](#running-winnie)
     * [Inviting your instance of Winnie to your server](#inviting-your-instance-of-winnie-to-your-server)
 * [Using Winnie](#using-winnie)
   * [Basic Features](#basic-features)
@@ -40,35 +40,71 @@
 
 ## Adding Winnie to your Discord server
 
-If you want to run Winnie on your server, you can either invite the public Winnie_Bot account or set up your own Discord bot with Winnie's code.
-
-### Inviting the public Winnie_Bot account
-
-If you want to invite the public Winnie_Bot account to your server, go [here](https://discordapp.com/api/oauth2/authorize?client_id=386676183791829002&permissions=0&scope=bot%20applications.commands).
-
 ### Setting up your own instance of Winnie
 
 #### Requirements
 
-* [Node.js](https://nodejs.org/en/)
-* [Yarn Package Manager](https://yarnpkg.com/)
-* [Docker](https://www.docker.com/)/[Docker Compose](https://docs.docker.com/compose/)
+* [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+
+That's it. Everything else runs inside containers.
 
 #### Setting up a Discord bot instance
 
 * Sign in to Discord
-* Go to the [Discord Dev Portal](https://discordapp.com/developers/), and click on 'My Apps'
-* Click on 'New App' to create a Discord application
+* Go to the [Discord Dev Portal](https://discord.com/developers/applications), and click on 'New Application'
 * Go to the Bot tab, and click the Add Bot button to create a bot user
+* Enable the **Message Content** intent under Privileged Gateway Intents
 * Copy the token under Bot/Token - you will need this in the next step
 
-#### Installation Instructions
+#### Running Winnie
 
-You can use the [`start-winnie.sh`](./start-winnie.sh) script to install Winnie's components as services on Linux machines.
+```bash
+cp .env.sample .env
+# Edit .env and set BOT_TOKEN to your Discord bot token
+docker compose up -d
+```
+
+This starts the full stack: PostgreSQL, Redis, runs database migrations, and launches the bot and worker processes. All data is persisted in Docker volumes.
+
+The stack is ARM64-compatible and optimised for Raspberry Pi deployment.
+
+To stop:
+
+```bash
+docker compose down
+```
+
+To view logs:
+
+```bash
+docker compose logs -f bot
+```
+
+**Configuration options in `.env`:**
+
+| Variable | Description | Default |
+|---|---|---|
+| `BOT_TOKEN` | Discord bot token (required) | |
+| `POSTGRES_USER` | Database user | `winnie` |
+| `POSTGRES_PASSWORD` | Database password | `winnie` |
+| `POSTGRES_DB` | Database name | `winnie` |
+| `REDIS_PASSWORD` | Redis password | `winnie_redis` |
+| `WORKER_REPLICAS` | Number of goal worker instances | `1` |
+| `POSTGRES_SSL` | Enable TLS for external Postgres | `false` |
+
+#### Local development (without Docker)
+
+```bash
+npm install
+npm run build
+# Start postgres and redis locally, configure .env with localhost addresses
+npm run migrate
+npm run start
+```
 
 #### Inviting your instance of Winnie to your server
 
-Click the 'Generate OAuth2 URL' button in the Discord Developer pane to generate your invite URL.  Using the invite URL, you can invite your instance of Winnie to any Discord server on which you have administrator permissions.
+In the Discord Developer Portal, go to OAuth2 > URL Generator. Select the `bot` and `applications.commands` scopes, then use the generated URL to invite Winnie to any server where you have administrator permissions.
 
 ## Using Winnie
 
@@ -90,18 +126,18 @@ The following new features are currently on the core team's roadmap:
 
 You can find more information about Winnie's commands in the [documentation](https://github.com/aigeroni/Winnie_Docs).
 
-## Dependencies and frameworks
+## Tech Stack
 
-* [BullMQ](https://github.com/taskforcesh/bullmq) - Event Queue Management
-* [Class-Validator](https://github.com/typestack/class-validator) - Model validations
-* [Discord.js](https://discord.js.org) - Discord API for Node.js
-* [ESLint](https://eslint.org/) - Linting
-* [i18next](https://www.i18next.com/) - Internationalization
-* [Luxon](https://moment.github.io/luxon/#/) - Date/Time manipulation
-* [node-cron](https://nodecron.com/) - Job scheduling
-* [PostgreSQL](https://www.postgresql.org/) - Persistent storage
-* [TypeORM](https://typeorm.io/#/) - Database Interaction
-* [Winston](https://github.com/winstonjs/winston) - Log management
+* **Runtime:** Node.js 22 / TypeScript 5
+* **Discord:** [Discord.js](https://discord.js.org) 14
+* **Database:** [PostgreSQL](https://www.postgresql.org/) 16 via [TypeORM](https://typeorm.io/) 0.3
+* **Queue:** [Redis](https://redis.io/) 7 via [BullMQ](https://github.com/taskforcesh/bullmq) 5
+* **i18n:** [i18next](https://www.i18next.com/) (7 languages)
+* **Scheduling:** [node-cron](https://nodecron.com/)
+* **Dates:** [Luxon](https://moment.github.io/luxon/)
+* **Validation:** [class-validator](https://github.com/typestack/class-validator)
+* **Logging:** [Winston](https://github.com/winstonjs/winston)
+* **Containerisation:** Docker with multi-arch support (amd64/arm64)
 
 ## Privacy Policy and Data Deletion
 
