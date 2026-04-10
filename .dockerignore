@@ -1,0 +1,13 @@
+node_modules
+dist
+data
+.git
+.github
+terraform
+services
+*.md
+.env
+.env.sample
+.dockerignore
+docker-compose*.yml
+Dockerfile
